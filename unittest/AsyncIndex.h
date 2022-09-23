@@ -56,11 +56,14 @@ class AsyncIndex : public VecIndex {
 #ifdef KNOWHERE_WITH_DISKANN
     AsyncIndex(std::string type, MetricType metric_type, std::shared_ptr<FileManager> file_manager) {
         if (type == "diskann_f") {
-            index_ = std::make_unique<knowhere::IndexDiskANN<float>>(type, metric_type, file_manager);
+            index_ = std::make_unique<knowhere::IndexDiskANN<float>>(
+                index_prefix, metric_type, std::shared_ptr<knowhere::FileManager>(new knowhere::LocalFileManager));
         } else if (type == "disann_ui8") {
-            index_ = std::make_unique<knowhere::IndexDiskANN<uint8_t>>(type, metric_type, file_manager);
+            index_ = std::make_unique<knowhere::IndexDiskANN<uint8_t>>(
+                index_prefix, metric_type, std::shared_ptr<knowhere::FileManager>(new knowhere::LocalFileManager));
         } else if (type == "diskann_i8") {
-            index_ = std::make_unique<knowhere::IndexDiskANN<int8_t>>(type, metric_type, file_manager);
+            index_ = std::make_unique<knowhere::IndexDiskANN<int8_t>>(
+                index_prefix, metric_type, std::shared_ptr<knowhere::FileManager>(new knowhere::LocalFileManager));
         } else {
             KNOWHERE_THROW_FORMAT("Invalid index type %s", std::string(type).c_str());
         }
