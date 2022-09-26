@@ -10,8 +10,10 @@
 // or implied. See the License for the specific language governing permissions and limitations under the License.
 
 #include <gtest/gtest.h>
+#include <omp.h>
 
 #include "knowhere/common/Exception.h"
+#include "knowhere/common/Utils.h"
 #include "knowhere/index/VecIndexFactory.h"
 #include "knowhere/index/vector_index/ConfAdapterMgr.h"
 #include "knowhere/index/vector_index/adapter/VectorAdapter.h"
@@ -145,4 +147,15 @@ TEST_P(AnnoyTest, annoy_slice) {
     ASSERT_EQ(index_->Dim(), dim);
     auto result = index_->Query(query_dataset, conf_, nullptr);
     AssertAnns(result, nq, knowhere::GetMetaTopk(conf_));
+}
+
+TEST_P(AnnoyTest, annoy_omp) {
+    int id = getpid();
+    int32_t before_build = knowhere::utils::GetThreadNum(id);
+    index_->BuildAll(base_dataset, conf_);
+    int32_t after_build = knowhere::utils::GetThreadNum(id);
+    EXPECT_GE(knowhere::utils::GetBuildOmpThread(conf_), after_build - before_build + 1);
+    auto result = index_->Query(query_dataset, conf_, nullptr);
+    int32_t after_query = knowhere::utils::GetThreadNum(id);
+    EXPECT_GE(knowhere::utils::GetQueryOmpThread(conf_), after_query - after_build + 1);
 }

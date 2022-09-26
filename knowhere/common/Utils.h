@@ -17,10 +17,19 @@
 
 namespace knowhere::utils {
 
+int32_t
+GetBuildOmpThread(const Config& conf);
+
+int32_t
+GetQueryOmpThread(const Config& conf);
+
 void
 SetBuildOmpThread(const Config& conf);
 
 void
 SetQueryOmpThread(const Config& conf);
+
+int32_t
+GetThreadNum(int id);
 
 }  // namespace knowhere::utils
